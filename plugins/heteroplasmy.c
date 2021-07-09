@@ -1,4 +1,4 @@
-/*  plugins/heteroplasmy.c -- Heuristic Mitochondrial Variant Caller
+/*  plugins/heteroplasmy.c -- Heteroplamic Mitochondrial Variant Caller
 
     Copyright (C) 2021 Grant Daly
 
@@ -36,7 +36,7 @@ static bcf_hdr_t *hdr;
 const char *about(void)
 {
     return
-      "Heuristic Mitochondrial Variant Caller\n";
+      "Heteroplasmic Mitochondrial Variant Caller\n";
         
 }
 
