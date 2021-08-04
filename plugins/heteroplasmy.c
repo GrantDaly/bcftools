@@ -23,179 +23,226 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.  */
 
 #include <stdio.h>
+
 #include <stdlib.h>
+
 #include <inttypes.h>
+
 #include <htslib/vcf.h>
 
-static bcf_hdr_t *hdr;
-
+static bcf_hdr_t * hdr;
 
 /*
     This short description is used to generate the output of `bcftools plugin -l`.
 */
-const char *about(void)
-{
-    return
-      "Heteroplasmic Mitochondrial Variant Caller\n";
-        
-}
+const char * about(void) {
+  return "Heteroplasmic Mitochondrial Variant Caller\n";
 
+}
 
 /*
     Called once at startup, allows to initialize local variables.
     Return 1 to suppress VCF/BCF header from printing, 0 otherwise.
-*/    
-int init(int argc, char **argv, bcf_hdr_t *in, bcf_hdr_t *out)
-{
-    char vafHead[] = "##FORMAT=<ID=AF,Number=A,Type=Float,Description=\"Allele Frequency\"";
+*/
+int init(int argc, char ** argv, bcf_hdr_t * in , bcf_hdr_t * out) {
+  const char vafHead[] = "##FORMAT=<ID=AF,Number=R,Type=Float,Description=\"Allele Frequency\"";
 
-    //out = in;
+  //out = in;
   // if the AF tag isn't present, add it
-  if(bcf_hdr_id2int(out, BCF_DT_ID, "AF") == -1) {
-    if( bcf_hdr_append(out, vafHead) == 0){ 
+  if (bcf_hdr_id2int(out, BCF_DT_ID, "AF") == -1) {
+    if (bcf_hdr_append(out, vafHead) == 0) {
       //printf("appended\n");
-    }
-    else
-    {
+    } else {
       printf("failed append\n");
       exit(1);
     }
-    
+
   }
   // hdr is the static header I will be accessing
   hdr = out;
-    
-    return 0;
+
+  return 0;
 }
 
+typedef struct sample_param {
+  int n_allele;
+  int dp;  
+int sampleIndex;
+    float *afArray;
+int * adArray;
+int * gtArray;
 
+}
+sample_param_t;
+
+void processSample(sample_param_t params) {
+  
+  const int n_allele = params.n_allele;
+  const int tempDP = params.dp;
+
+  int tempAD = 0;
+  
+  float * afArray = params.afArray;
+  int * adArray = params.adArray;
+
+  int sampleIndex = params.sampleIndex;
+
+  int * gt_arr = params.gtArray;
+
+  int candGT_arr[2] = {
+      -1,
+      -1
+    };
+  //ndGT_arr[0] = -1;
+  //candGT_arr[1] = -1;
+  
+  for (int j = 0; j < n_allele; j++) {
+    tempAD = adArray[(sampleIndex * n_allele) + j];
+
+    float tempAF = 0.0;
+    if (tempDP != 0) {
+
+      tempAF = (float)((double) tempAD / (double) tempDP);
+    } else {
+      tempAF = 0;
+    }
+
+    afArray[(sampleIndex * n_allele) + j] = tempAF;
+    //printf("dp %d af %f\n", tempDP, tempAF);
+    if ((tempDP >= 20) && (tempAF >= 0.99)) {
+      candGT_arr[0] = j;
+      candGT_arr[1] = j;
+      // if I find a homozygous site can skip additional searching
+      // could put a goto if I wanted minor improvement
+    } else if (tempDP < 20) {
+      // if depth requirment not met make it the original values. can be missing genotype
+    } else if ((tempDP >= 500) && (tempAF >= 0.01)) {
+      // heteroplasmy call
+      if (candGT_arr[0] == -1) {
+
+        candGT_arr[0] = j;
+      } else if (candGT_arr[1] == -1) {
+        candGT_arr[1] = j;
+      } else {
+        //	  printf("site has more that 2 heteroplamies, and cannot display additional\n");
+      }
+    }
+
+    // verify that these values were changed, and if so update genotype
+    if (candGT_arr[0] != -1){
+      gt_arr[sampleIndex * 2] = bcf_gt_unphased(candGT_arr[0]);
+    }
+
+    if (candGT_arr[1] != -1){
+      gt_arr[sampleIndex * 2 + 1] = bcf_gt_unphased(candGT_arr[1]);
+    }
+
+  }
+
+}
 /*
     Called for each VCF record. Return rec to output the line or NULL
     to suppress output.
 */
-bcf1_t *process(bcf1_t *rec)
-{
+bcf1_t * process(bcf1_t * rec) {
 
-      bcf_unpack(rec, BCF_UN_ALL);
+  bcf_unpack(rec, BCF_UN_ALL);
 
-      const int n_allele = rec->n_allele;
-      const int nsamples = bcf_hdr_nsamples(hdr);
-    
-    int32_t *values = 0;
-    int count = 0;
-    int formatReturn = bcf_get_format_int32(hdr, rec, "AD", &values, &count);
-    if(formatReturn < 0){
-      printf("error with get format\n");
-      exit(1);
-    }
+  const int n_allele = rec -> n_allele;
+  const int nsamples = bcf_hdr_nsamples(hdr);
 
-    // get dp (number of high quality bases)
-    int32_t *depthDP = 0;
-    int dpCount = 0;
-    formatReturn = bcf_get_format_int32(hdr, rec, "DP", &depthDP, &dpCount);
-    
-    // get genotypes
-    int ngt, *gt_arr = NULL, ngt_arr = 0;
-    ngt = bcf_get_genotypes(hdr, rec, &gt_arr, &ngt_arr);
-    //printf("ngt %d    ngt_arr %d\n", ngt, ngt_arr);
-    /*for(int i=0; i < ngt;i++){
-      printf("genotypes %d\n", gt_arr[i]);
-      }*/
+  int32_t * adArray = 0;
+  int adCount = 0;
+  //int formatReturn;
+  //int formatReturn = bcf_get_format_int32(hdr, rec, "AD", adArray, adCount);
+  if (bcf_get_format_int32(hdr, rec, "AD", & adArray, & adCount) < 0) {
+    printf("error with get format\n");
+    exit(1);
+  }
 
-    // get allele frequency array
-    /*double *afArray = NULL;
-    int afCount = 0;
-    int afReturn = bcf_get_format_float(hdr, inLocus, "DP", &afArray, &afCount);
-    printf("######## number of af %d or %d\n", afReturn, afCount);*/
-    int numAF = n_allele * nsamples;
-    float* afArray = malloc(n_allele * nsamples * sizeof(float));
-    
-    int32_t tempAD = 0;
-    int32_t tempDP = 0;
-    for(int i =0; i < nsamples;i++){
-      // check if the genotype is missing from low coverage sites and skip if soft
-      // causes issue because AF ends up not being initialized. could possibly put this after the AF logic.
-      /*if (bcf_gt_is_missing(gt_arr[i*2])) {
+  /* int32_t * adfArray = 0; */
+  /* int adfCount = 0; */
+  /* if (bcf_get_format_int32(hdr, rec, "ADF", & adfArray, & adfCount) < 0) { */
+  /*   printf("error with get format\n"); */
+  /*   exit(1); */
+  /*   } */
+
+  /* int32_t * adrArray = 0; */
+  /* int adrCount = 0; */
+  /* if (bcf_get_format_int32(hdr, rec, "ADR", & adfArray, & adfCount) < 0) { */
+  /*   printf("error with get format\n"); */
+  /*   exit(1); */
+  /*   } */
+
+  // get dp (number of high quality bases)
+  int32_t * depthDP = 0;
+  int dpCount = 0;
+  if (bcf_get_format_int32(hdr, rec, "DP", & depthDP, & dpCount) < 0) {
+    printf("error with get format\n");
+    exit(1);
+  }
+
+  // get genotypes
+  int ngt, * gt_arr = NULL, ngt_arr = 0;
+  ngt = bcf_get_genotypes(hdr, rec, & gt_arr, & ngt_arr);
+  //printf("ngt %d    ngt_arr %d\n", ngt, ngt_arr);
+  /*for(int i=0; i < ngt;i++){
+    printf("genotypes %d\n", gt_arr[i]);
+    }*/
+
+  // get allele frequency array
+  /*double *afArray = NULL;
+  int afCount = 0;
+  int afReturn = bcf_get_format_float(hdr, inLocus, "DP", &afArray, &afCount);
+  printf("######## number of af %d or %d\n", afReturn, afCount);*/
+  int numAF = n_allele * nsamples;
+  float * afArray = malloc(n_allele * nsamples * sizeof(float));
+
+  //int32_t tempAD = 0;
+  int32_t tempDP = 0;
+  for (int i = 0; i < nsamples; i++) {
+    // check if the genotype is missing from low coverage sites and skip if soft
+    // causes issue because AF ends up not being initialized. could possibly put this after the AF logic.
+    /*if (bcf_gt_is_missing(gt_arr[i*2])) {
 	//	printf("############ missing gt ############\n");
 	continue;
 	}*/
-      
-      int candGT_arr[2] = {0, 0};
-      
-      tempDP = depthDP[i];
-      
-      candGT_arr[0] = -1;
-      candGT_arr[1] = -1;
-      for(int j =0; j < n_allele; j++){
-      
-      tempAD = values[(i*n_allele) + j];
-      
-      float tempAF = 0.0;
-      if(tempDP != 0){
-	
-	tempAF = (float)((double) tempAD / (double) tempDP) ;
-      }
-      else
-	{
-	  tempAF = 0;
-	}
-      
-      afArray[(i*n_allele) + j] = tempAF;
 
-      if((tempDP >= 20) && (tempAF >= 0.99)){
-	candGT_arr[0] = j;
-	candGT_arr[1] = j;
-	// if I find a homozygous site can skip additional searching
-	// could put a goto if I wanted minor improvement
-	}
-      else if(tempDP < 20){
-	// if depth requirment not met make it the original values. can be missing genotype
-      }
-      
-      else if((tempDP >= 500) && (tempAF >= 0.01)){
-	// heteroplasmy call, need to see if the pigeon hole is filled
-	if(candGT_arr[0] == -1){
- 	  candGT_arr[0] = j;
-	}
-	else if(candGT_arr[1] == -1){
-	  candGT_arr[1] = j;
-	}
-	else {
-	  //	  printf("site has more that 2 heteroplamies, and cannot display additional\n");
-      }
-      }
+    /* int candGT_arr[2] = { */
+    /*   0, */
+    /*   0 */
+    /* }; */
 
-      }
-      
-      // verify that these values were changed, and if so update genotype
-      if(candGT_arr[0] != -1)
-      gt_arr[i*2] = bcf_gt_unphased(candGT_arr[0]);
+    tempDP = depthDP[i];
 
-      if(candGT_arr[1] != -1)
-      gt_arr[i*2 + 1] = bcf_gt_unphased(candGT_arr[1]);
-
-    }
-
-    bcf_update_genotypes(hdr, rec, gt_arr, ngt);
-
-    // update format AF tags
-    bcf_update_format_float(hdr, rec, "AF", afArray, numAF);
     
-     free(afArray);
-     return rec;
+    sample_param_t sampleParams = {
+      .n_allele = n_allele,
+      .dp = tempDP,
+      .gtArray = gt_arr,
+      .adArray = adArray,
+      .afArray = afArray,
+      .sampleIndex = i
+      
+    };
+    //processSample(n_allele, tempDF, tempAD, afArray);
+    processSample(sampleParams);
+    
+  }
+
+  bcf_update_genotypes(hdr, rec, gt_arr, ngt);
+
+  // update format AF tags
+  bcf_update_format_float(hdr, rec, "AF", afArray, numAF);
+
+  free(afArray);
+  return rec;
 
 }
-
-
-    
-
 
 /*
     Clean up.
 */
-void destroy(void)
-{
+void destroy(void) {
 
 }
-
-

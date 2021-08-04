@@ -1,0 +1,71 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=chr1,length=248956422>
+##contig=<ID=chr10,length=133797422>
+##contig=<ID=chr11,length=135086622>
+##contig=<ID=chr12,length=133275309>
+##contig=<ID=chr13,length=114364328>
+##contig=<ID=chr14,length=107043718>
+##contig=<ID=chr15,length=101991189>
+##contig=<ID=chr16,length=90338345>
+##contig=<ID=chr17,length=83257441>
+##contig=<ID=chr18,length=80373285>
+##contig=<ID=chr19,length=58617616>
+##contig=<ID=chr2,length=242193529>
+##contig=<ID=chr20,length=64444167>
+##contig=<ID=chr21,length=46709983>
+##contig=<ID=chr22,length=50818468>
+##contig=<ID=chr3,length=198295559>
+##contig=<ID=chr4,length=190214555>
+##contig=<ID=chr5,length=181538259>
+##contig=<ID=chr6,length=170805979>
+##contig=<ID=chr7,length=159345973>
+##contig=<ID=chr8,length=145138636>
+##contig=<ID=chr9,length=138394717>
+##contig=<ID=chrM,length=16569>
+##contig=<ID=chrX,length=156040895>
+##contig=<ID=chrY,length=57227415>
+##ALT=<ID=*,Description="Represents allele(s) other than observed.">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=IDV,Number=1,Type=Integer,Description="Maximum number of raw reads supporting an indel">
+##INFO=<ID=IMF,Number=1,Type=Float,Description="Maximum fraction of raw reads supporting an indel">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw read depth">
+##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
+##INFO=<ID=RPB,Number=1,Type=Float,Description="Mann-Whitney U test of Read Position Bias (bigger is better)">
+##INFO=<ID=MQB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality Bias (bigger is better)">
+##INFO=<ID=BQB,Number=1,Type=Float,Description="Mann-Whitney U test of Base Quality Bias (bigger is better)">
+##INFO=<ID=MQSB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)">
+##INFO=<ID=SGB,Number=1,Type=Float,Description="Segregation based metric.">
+##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="List of Phred-scaled genotype likelihoods">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Number of high-quality bases">
+##FORMAT=<ID=SP,Number=1,Type=Integer,Description="Phred-scaled strand bias P-value">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths (high-quality bases)">
+##FORMAT=<ID=ADF,Number=R,Type=Integer,Description="Allelic depths on the forward strand (high-quality bases)">
+##FORMAT=<ID=ADR,Number=R,Type=Integer,Description="Allelic depths on the reverse strand (high-quality bases)">
+##INFO=<ID=AD,Number=R,Type=Integer,Description="Total allelic depths (high-quality bases)">
+##INFO=<ID=ADF,Number=R,Type=Integer,Description="Total allelic depths on the forward strand (high-quality bases)">
+##INFO=<ID=ADR,Number=R,Type=Integer,Description="Total allelic depths on the reverse strand (high-quality bases)">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AF,Number=R,Type=Float,Description="Allele Frequency">
+##INFO=<ID=ICB,Number=1,Type=Float,Description="Inbreeding Coefficient Binomial test (bigger is better)">
+##INFO=<ID=HOB,Number=1,Type=Float,Description="Bias in the number of HOMs number (smaller is better)">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes for each ALT allele, in the same order as listed">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=MQ,Number=1,Type=Integer,Description="Average mapping quality">
+##bcftools_callVersion=1.11-19-gec5eb61+htslib-1.11-19-g9a55e4e
+##bcftools_callCommand=call -m -A; Date=Mon Apr 12 18:44:58 2021
+##bcftools_filterVersion=1.11-19-gec5eb61+htslib-1.11-19-g9a55e4e
+##bcftools_filterCommand=filter -e ALT=="." -O z -o grouped.raw.vcf.gz; Date=Mon Apr 12 18:44:58 2021
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Sample_1	Sample_2	Sample_3	Sample_5	Sample_6	Sample_7	Sample_8	Sample_9	Sample_10	Sample_11	Sample_12
+chrM	7	.	A	G	24.0023	PASS	DP=6442;ADF=2757,1;ADR=1,0;AD=2758,1;SGB=-0.612226;RPB=1;MQB=1;MQSB=1;BQB=1;MQ0F=0;AC=0;AN=18;DP4=2757,1,1,0;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,3,37:1:0:1,0:0,0:1,0:0,0	0/0:0,255,255:341:0:340,1:0,0:340,1:-6.29761e+06,-6.29761e+06	0/0:0,255,255:447:0:447,0:0,0:447,0:1.79866,0	0/0:0,255,255:196:0:195,0:1,0:196,0:0,0	0/0:0,255,255:454:0:454,0:0,0:454,0:-4.73014e+06,0	0/0:0,255,255:332:0:332,0:0,0:332,0:0,-6.46832e+06	0/0:0,255,255:385:0:385,0:0,0:385,0:-5.57788e+06,2002.68	0/0:0,255,255:157:0:157,0:0,0:157,0:5302.34,0	0/0:0,255,255:446:0:446,0:0,0:446,0:0,-4.81499e+06
+chrM	8	.	G	T	24.0504	PASS	DP=6515;ADF=2806,3;ADR=1,0;AD=2807,3;VDB=0.0221621;SGB=3.87567;RPB=0.139329;MQB=0.999931;MQSB=1;BQB=0.77117;MQ0F=0;AC=0;AN=18;DP4=2806,1,3,0;MQ=59GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,3,36:1:0:1,0:0,0:1,0:0,-2.14748e+09	0/0:0,255,255:355:0:355,0:0,0:355,0:-6.04925e+06,2.26479	0/0:0,255,255:447:0:447,0:0,0:447,0:0,0	0/0:0,255,255:204:0:203,0:1,0:204,0:0,-1.05269e+07	0/0:0,255,255:449:0:449,0:0,0:449,0:0,0	0/0:0,255,255:334:0:334,0:0,0:334,0:-6.42959e+06,-6.42959e+06	0/0:0,255,255:385:0:382,3:0,0:382,3:2002.68,2162.25	0/0:0,255,255:189:0:189,0:0,0:189,0:0,0	0/0:0,255,255:446:0:446,0:0,0:446,0:-4.81499e+06,0
+chrM	10	.	T	C	24.0051	PASS	DP=6565;ADF=2881,1;ADR=1,0;AD=2882,1;SGB=-0.612226;RPB=1;MQB=1;MQSB=1;BQB=1;MQ0F=0;AC=0;AN=18;DP4=2881,1,1,0;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,3,31:1:0:1,0:0,0:1,0:-2.14748e+09,-2.14748e+09	0/0:0,255,255:374:0:374,0:0,0:374,0:2.14973,0	0/0:0,255,255:453:0:453,0:0,0:453,0:0,0	0/0:0,255,255:207:0:206,0:1,0:207,0:-1.03743e+07,0	0/0:0,255,255:455:0:455,0:0,0:455,0:0,-4.71974e+06	0/0:0,255,255:337:0:337,0:0,0:337,0:-6.37236e+06,2287.92	0/0:0,255,255:390:0:389,1:0,0:389,1:2134.53,0	0/0:0,255,255:216:0:216,0:0,0:216,0:0,-9.94205e+06	0/0:0,255,255:450:0:450,0:0,0:450,0:0,0
+chrM	11	.	C	G	24.004	PASS	DP=6591;ADF=2902,1;ADR=1,0;AD=2903,1;SGB=-0.612226;RPB=1;MQB=1;MQSB=1;BQB=1;MQ0F=0;AC=0;AN=18;DP4=2902,1,1,0;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,3,38:1:0:1,0:0,0:1,0:0,0	0/0:0,255,255:381:0:381,0:0,0:381,0:-5.63644e+06,0	0/0:0,255,255:453:0:452,1:0,0:452,1:0,0	0/0:0,255,255:213:0:212,0:1,0:213,0:0,-1.00821e+07	0/0:0,255,255:455:0:455,0:0,0:455,0:-4.71974e+06,0	0/0:0,255,255:339:0:339,0:0,0:339,0:0,-6.33476e+06	0/0:0,255,255:387:0:387,0:0,0:387,0:-5.54905e+06,2.07752	0/0:0,255,255:225:0:225,0:0,0:225,0:0,0	0/0:0,255,255:450:0:450,0:0,0:450,0:0,-4.77219e+06
+chrM	13	.	A	C	24.0072	PASS	DP=6653;ADF=2971,1;ADR=1,0;AD=2972,1;SGB=-0.612226;RPB=1;MQB=1;MQSB=1;BQB=1;MQ0F=0;AC=0;AN=18;DP4=2971,1,1,0;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,3,39:1:0:1,0:0,0:1,0:0,0	0/0:0,255,255:407:0:406,1:0,0:406,1:-5.27637e+06,0	0/0:0,255,255:458:0:458,0:0,0:458,0:0,-4.68883e+061/1:0,255,255:230:0:229,0:1,0:230,0:-9.33688e+06,3352.3	0/0:0,255,255:459:0:459,0:0,0:459,0:1813.66,0	0/0:0,255,255:339:0:339,0:0,0:339,0:0,-6.33476e+06	0/0:0,255,255:390:0:390,0:0,0:390,0:0,0	0/0:0,255,255:237:0:237,0:0,0:237,0:0,-9.06111e+06	0/0:0,255,255:452:0:452,0:0,0:452,0:0,27442
+chrM	16444	.	C	T,A	238	PASS	DP=7553;ADF=4840,386,1;ADR=1714,384,0;AD=6554,770,1;VDB=0.270455;SGB=-4341.41;RPB=0.0588226;MQB=0.222254;MQSB=3.79069e-05;BQB=0.0189688;MQ0F=0;ICB=0.128356;HOB=0.045;AC=3,0;AN=20;DP4=4840,1714,387,384;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	./.:0,0,0,0,0,0:0:0:0,0,0:0,0,0:0,0,0:0,0,0	0/0:0,3,39,3,39,39:1:0:0,0,0:1,0,0:1,0,0:0,0,0	0/0:16,0,202,37,205,233:8:0:5,0,0:2,1,0:7,1,0:0,0,0	0/0:0,78,255,255,255,255:859:6:348,43,0:404,64,0:752,107,0:0,0,0	0/0:0,255,255,255,255,255:902:109:718,12,0:146,26,0:864,38,0:0,0,0	0/0:19,0,255,255,255,255:870:0:218,50,0:491,111,0:709,161,0:0,0,0	0/0:0,243,255,255,255,255:936:9:806,46,0:76,8,0:882,54,0:0,0,0	0/0:0,255,255,255,255,255:959:1:673,50,1:220,15,0:893,65,1:0,0,0	0/0:0,255,255,255,255,255:953:1:864,35,0:53,1,0:917,36,0:0,0,0	0/0:255,0,255,255,255,255:866:5:247,140,0:321,158,0:568,298,0:0,0,0	0/0:0,255,255,255,255,255:971:0:961,10,0:0,0,0:961,10,0:0,0,0
+chrM	16496	.	G	A	21.4345	PASS	DP=7477;ADF=3717,21;ADR=3046,392;AD=6763,413;VDB=0.279251;SGB=-2335.85;RPB=0.458302;MQB=0.996407;MQSB=0.952518;BQB=0.00205609;MQ0F=0;ICB=0.039604;HOB=0.0165289;AC=2;AN=22;DP4=3717,3046,21,392;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	0/0:40,3,0:1:0:0,0:0,1:0,1:0,0	0/0:0,3,31:1:0:1,0:0,0:1,0:0,0	0/0:0,15,206:5:0:3,0:2,0:5,0:0,0	0/0:0,255,255:857:58:213,3:572,69:785,72:0,0	0/0:0,255,255:865:23:568,0:292,5:860,5:0,0	0/0:0,232,255:744:20:54,0:625,65:679,65:0,0	0/0:0,255,255:935:20:532,4:387,12:919,16:0,0	0/0:0,255,255:967:89:496,1:438,32:934,33:0,0	0/0:0,255,255:963:0:779,2:182,0:961,2:0,0	0/0:31,0,255:856:52:92,8:548,208:640,216:0,0	0/0:0,255,255:982:0:979,3:0,0:979,3:0,0
+chrM	16519	.	T	C,A,G	556	PASS	DP=7224;ADF=2164,314,0,0;ADR=2484,1686,2,1;AD=4648,2000,2,1;VDB=0.117981;SGB=-2085.95;RPB=3.89878e-05;MQB=0.959743;MQSB=0.388695;BQB=0;MQ0F=0;ICB=0.684458;HOB=0.155;AC=7,0,0;AN=20;DP4=2164,2484,314,1689;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	0/0:40,3,0,40,3,40,40,3,40,40:1:0:0,0,0,0:0,1,0,0:0,1,0,0:0,0,0,0	./.:0,0,0,0,0,0,0,0,0,0:0:0:0,0,0,0:0,0,0,0:0,0,0,0:0,0,0,0	0/0:23,0,139,35,142,170,35,142,170,170:5:0:1,1,0,0:3,0,0,0:4,1,0,0:0,0,0,0	0/0:255,255,0,255,255,255,255,255,255,255:724:2:0,107,0,0:6,609,1,1:6,716,1,1:0,0,0,0	0/0:255,255,0,255,255,255,255,255,255,255:779:0:0,186,0,0:2,591,0,0:2,777,0,0:0,0,0,0	0/0:0,72,255,255,255,255,255,255,255,255:639:39:37,0,0,0:465,136,1,0:502,136,1,0:0,0,0,0	0/0:0,255,255,255,255,255,255,255,255,255:884:28:322,6,0,0:520,36,0,0:842,42,0,0:0,0,0,0	0/0:0,255,255,255,255,255,255,255,255,255:937:94:268,0,0,0:605,64,0,0:873,64,0,0:0,0,0,0	0/0:0,255,255,255,255,255,255,255,255,255:911:4:554,11,0,0:336,10,0,0:890,21,0,0:0,0,0,0	0/0:55,0,255,255,255,255,255,255,255,255:810:37:25,0,0,0:546,239,0,0:571,239,0,0:0,0,0,0	0/0:0,255,255,255,255,255,255,255,255,255:961:0:957,3,0,0:1,0,0,0:958,3,0,0:0,0,0,0
+chrM	16526	.	G	A	407	PASS	DP=7114;ADF=1076,892;ADR=4176,484;AD=5252,1376;VDB=0.0356007;SGB=961.199;RPB=0.0658199;MQB=0.00021867;MQSB=0.00663864;BQB=0;MQ0F=0;ICB=0.649237;HOB=0.155;AC=3;AN=20;DP4=1076,4176,892,484;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	0/0:0,3,40:1:0:0,0:1,0:1,0:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,15,186:5:0:2,0:3,0:5,0:0,0	0/0:0,255,255:681:0:68,1:612,0:680,1:0,0	0/0:0,255,255:911:0:139,0:772,0:911,0:0,0	0/0:0,255,255:593:0:27,0:566,0:593,0:0,0	0/0:0,255,255:910:0:230,0:678,2:908,2:0,0	0/0:0,255,255:947:0:159,0:788,0:947,0:0,0	0/0:0,255,255:933:0:451,0:482,0:933,0:0,0	0/0:209,0,131:756:0:0,1:274,481:274,482:0,0	0/0:255,255,0:891:0:0,890:0,1:0,891:0,0
+chrM	16527	.	C	T	118	PASS	DP=7056;ADF=1919,1;ADR=4071,606;AD=5990,607;VDB=0.000742543;SGB=-2813.31;RPB=2.57504e-05;MQB=0.609548;MQSB=0.000186587;BQB=0.00224936;MQ0F=0;ICB=0.0487805;HOB=0.02;AC=2;AN=20;DP4=1919,4071,1,606;MQ=59	GT:PL:DP:SP:ADF:ADR:AD:AF	0/0:40,3,0:1:0:0,0:0,1:0,1:0,0	./.:0,0,0:0:0:0,0:0,0:0,0:0,0	0/0:0,12,155:4:0:1,0:3,0:4,0:0,0	0/0:0,255,255:658:20:49,0:545,64:594,64:0,0	0/0:0,255,255:907:18:136,0:742,29:878,29:0,0	0/0:0,6,255:581:28:27,0:422,132:449,132:0,0	0/0:0,255,255:910:46:212,0:658,40:870,40:0,0	0/0:0,255,255:920:49:128,0:718,74:846,74:0,0	0/0:0,255,255:922:32:429,1:477,15:906,16:0,0	0/0:128,0,208:757:0:1,0:505,251:506,251:0,0	0/0:0,255,255:937:0:936,0:1,0:937,0:0,0
