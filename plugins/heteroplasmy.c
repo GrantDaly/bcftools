@@ -52,6 +52,18 @@ int init(int argc, char ** argv, bcf_hdr_t * in , bcf_hdr_t * out) {
   if (bcf_hdr_id2int(out, BCF_DT_ID, "AF") == -1) {
     if (bcf_hdr_append(out, vafHead) == 0) {
       //printf("appended\n");
+    }  else {
+      printf("failed append\n");
+      exit(1);
+    }
+
+  }
+
+  const char artHead[] = "##FORMAT=<ID=ART,Number=A,Type=Integer,Description=\"Artifact Score\"";
+  // if the AF tag isn't present, add it
+  if (bcf_hdr_id2int(out, BCF_DT_ID, "ART") == -1) {
+    if (bcf_hdr_append(out, artHead) == 0) {
+      //printf("appended\n");
     } else {
       printf("failed append\n");
       exit(1);
@@ -66,39 +78,103 @@ int init(int argc, char ** argv, bcf_hdr_t * in , bcf_hdr_t * out) {
 
 typedef struct sample_param {
   int n_allele;
-  int dp;  
+  int dp;
 int sampleIndex;
-    float *afArray;
+float *afArray;
 int * adArray;
 int * gtArray;
-
-}
+  int * adfArray;
+int * adrArray;
+  int * artArray;
+  }
 sample_param_t;
 
+int minimumInt(int a, int b){
+  if(a <= b)
+    return a;
+  else
+    return b;
+}
+
+int maximumInt(int a, int b){
+  if(a >= b)
+    return a;
+  else
+    return b;
+}
 void processSample(sample_param_t params) {
   
   const int n_allele = params.n_allele;
   const int tempDP = params.dp;
 
   int tempAD = 0;
+  int tempADF = 0;
+  int tempADR = 0;
   
   float * afArray = params.afArray;
   int * adArray = params.adArray;
+  int * adfArray = params.adfArray;
+  int * adrArray = params.adrArray;
+
+  int * artArray = params.artArray;
 
   int sampleIndex = params.sampleIndex;
 
   int * gt_arr = params.gtArray;
 
+
+
+  // call possible artifacts on non reference alleles
+  int tempADFRef = adfArray[(sampleIndex * n_allele)];
+  int tempADRRef = adrArray[(sampleIndex * n_allele)];
+  int tempADRef = tempADFRef + tempADRRef;
+  int tempADFVar = 0;
+  int tempADRVar = 0;
+  int numAltAlleles = n_allele - 1;
+
+  if(tempADRef >= 100){
+      int minimumADStrand =  minimumInt(tempADFRef, tempADRRef);
+      if(tempADRef != 0){
+	double refFrac = minimumADStrand / ((double) tempADRef);
+
+	// if meets the minimums so calculate artifact score
+	if(refFrac >= 0.2){
+	  for (int j = 1; j < n_allele ; j++){
+	    tempADFVar = adfArray[(sampleIndex * n_allele) + j];
+	    tempADRVar = adrArray[(sampleIndex * n_allele) + j];
+	    //printf("forward %d reverse %d\n", tempADFVar, tempADRVar);
+	    if((tempADFVar >= 3) && (tempADRVar == 0)) {
+	      //printf("forward artifact\n");
+	      artArray[(sampleIndex * numAltAlleles) + (j - 1)] = tempADFVar;
+	      }
+	    else if((tempADRVar >= 3) && (tempADFVar == 0)) {
+	      //printf("reverse artifact\n");
+	      artArray[(sampleIndex * numAltAlleles) + (j - 1)] = - 1 * tempADRVar;
+	      }
+	    //printf("array value %d\n", artArray[(sampleIndex * numAltAlleles) + (j - 1)]);
+	  }
+      }
+  }
+  
+    
+
+  }
+  
+  
   int candGT_arr[2] = {
       -1,
       -1
     };
   //ndGT_arr[0] = -1;
   //candGT_arr[1] = -1;
-  
+
+  // call variants on all alleles
   for (int j = 0; j < n_allele; j++) {
     tempAD = adArray[(sampleIndex * n_allele) + j];
+    tempADF = adfArray[(sampleIndex * n_allele) + j];
+    tempADR = adrArray[(sampleIndex * n_allele) + j];
 
+    // calculate AF
     float tempAF = 0.0;
     if (tempDP != 0) {
 
@@ -107,16 +183,18 @@ void processSample(sample_param_t params) {
       tempAF = 0;
     }
 
+    // determine if the allele is possibly an artifact
+
     afArray[(sampleIndex * n_allele) + j] = tempAF;
+    
     //printf("dp %d af %f\n", tempDP, tempAF);
-    if ((tempDP >= 20) && (tempAF >= 0.99)) {
+    if((tempDP >=20) && (tempADF >= 10) && (tempADR >= 10)) {
+    if (tempAF >= 0.99) {
       candGT_arr[0] = j;
       candGT_arr[1] = j;
       // if I find a homozygous site can skip additional searching
       // could put a goto if I wanted minor improvement
-    } else if (tempDP < 20) {
-      // if depth requirment not met make it the original values. can be missing genotype
-    } else if ((tempDP >= 500) && (tempAF >= 0.01)) {
+    }  else if ((tempDP >= 500) && (tempAF >= 0.01)) {
       // heteroplasmy call
       if (candGT_arr[0] == -1) {
 
@@ -127,6 +205,10 @@ void processSample(sample_param_t params) {
         //	  printf("site has more that 2 heteroplamies, and cannot display additional\n");
       }
     }
+  }
+  }
+  
+    
 
     // verify that these values were changed, and if so update genotype
     if (candGT_arr[0] != -1){
@@ -137,7 +219,7 @@ void processSample(sample_param_t params) {
       gt_arr[sampleIndex * 2 + 1] = bcf_gt_unphased(candGT_arr[1]);
     }
 
-  }
+  
 
 }
 /*
@@ -160,19 +242,19 @@ bcf1_t * process(bcf1_t * rec) {
     exit(1);
   }
 
-  /* int32_t * adfArray = 0; */
-  /* int adfCount = 0; */
-  /* if (bcf_get_format_int32(hdr, rec, "ADF", & adfArray, & adfCount) < 0) { */
-  /*   printf("error with get format\n"); */
-  /*   exit(1); */
-  /*   } */
+  int32_t * adfArray = 0;
+  int adfCount = 0;
+  if (bcf_get_format_int32(hdr, rec, "ADF", & adfArray, & adfCount) < 0) {
+    printf("error with get format\n");
+    exit(1);
+    }
 
-  /* int32_t * adrArray = 0; */
-  /* int adrCount = 0; */
-  /* if (bcf_get_format_int32(hdr, rec, "ADR", & adfArray, & adfCount) < 0) { */
-  /*   printf("error with get format\n"); */
-  /*   exit(1); */
-  /*   } */
+  int32_t * adrArray = 0;
+  int adrCount = 0;
+  if (bcf_get_format_int32(hdr, rec, "ADR", & adrArray, & adrCount) < 0) {
+    printf("error with get format\n");
+    exit(1);
+    }
 
   // get dp (number of high quality bases)
   int32_t * depthDP = 0;
@@ -196,7 +278,14 @@ bcf1_t * process(bcf1_t * rec) {
   int afReturn = bcf_get_format_float(hdr, inLocus, "DP", &afArray, &afCount);
   printf("######## number of af %d or %d\n", afReturn, afCount);*/
   int numAF = n_allele * nsamples;
-  float * afArray = malloc(n_allele * nsamples * sizeof(float));
+  float * afArray = malloc(numAF * sizeof(float));
+
+  // create and initialize the artifact array.
+  int numART = (n_allele -1) * nsamples;
+  int * artArray = malloc(numART * sizeof(int));
+  for(int i = 0; i < numART; i++){
+    artArray[i] = 0;
+  }
 
   //int32_t tempAD = 0;
   int32_t tempDP = 0;
@@ -222,7 +311,10 @@ bcf1_t * process(bcf1_t * rec) {
       .gtArray = gt_arr,
       .adArray = adArray,
       .afArray = afArray,
-      .sampleIndex = i
+      .sampleIndex = i,
+      .adfArray = adfArray,
+      .adrArray = adrArray,
+      .artArray = artArray
       
     };
     //processSample(n_allele, tempDF, tempAD, afArray);
@@ -234,8 +326,13 @@ bcf1_t * process(bcf1_t * rec) {
 
   // update format AF tags
   bcf_update_format_float(hdr, rec, "AF", afArray, numAF);
+  
+  if(bcf_update_format_int32(hdr, rec, "ART", artArray, numART) != 0){
+    printf("error updating artifact score\n");
+  }
 
   free(afArray);
+  free(artArray);
   return rec;
 
 }
