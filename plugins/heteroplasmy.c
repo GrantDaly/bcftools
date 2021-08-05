@@ -59,7 +59,7 @@ int init(int argc, char ** argv, bcf_hdr_t * in , bcf_hdr_t * out) {
 
   }
 
-  const char artHead[] = "##FORMAT=<ID=ART,Number=R,Type=Integer,Description=\"Artifact Score\"";
+  const char artHead[] = "##FORMAT=<ID=ART,Number=A,Type=Integer,Description=\"Artifact Score\"";
   // if the AF tag isn't present, add it
   if (bcf_hdr_id2int(out, BCF_DT_ID, "ART") == -1) {
     if (bcf_hdr_append(out, artHead) == 0) {
