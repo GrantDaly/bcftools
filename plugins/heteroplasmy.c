@@ -105,7 +105,7 @@ int maximumInt(int a, int b){
 void processSample(sample_param_t params) {
   
   const int n_allele = params.n_allele;
-  const int tempDP = params.dp;
+  //const int tempDP = params.dp;
 
   int tempAD = 0;
   int tempADF = 0;
@@ -168,7 +168,15 @@ void processSample(sample_param_t params) {
   //ndGT_arr[0] = -1;
   //candGT_arr[1] = -1;
 
+  int totalBases = 0;
+  for (int j = 0; j < n_allele; j++) {
+    totalBases += adArray[(sampleIndex * n_allele) + j];
+  }
   // call variants on all alleles
+
+  // normal vcf has 2 alleles so I'm using this. pretty good assumption because there are unlikely to be many tripplet heteroplasmies
+  //int maxAlt = 2;
+  //int numberAllelesAssigned = 0;
   for (int j = 0; j < n_allele; j++) {
     tempAD = adArray[(sampleIndex * n_allele) + j];
     tempADF = adfArray[(sampleIndex * n_allele) + j];
@@ -176,9 +184,10 @@ void processSample(sample_param_t params) {
 
     // calculate AF
     float tempAF = 0.0;
-    if (tempDP != 0) {
+    if (totalBases > 0) {
 
-      tempAF = (float)((double) tempAD / (double) tempDP);
+      tempAF = (float)((double) tempAD / (double) totalBases);
+      //printf("allele depth %d total bases %d fraction %f\n",tempAD, totalBases, tempAF);
     } else {
       tempAF = 0;
     }
@@ -187,37 +196,48 @@ void processSample(sample_param_t params) {
 
     afArray[(sampleIndex * n_allele) + j] = tempAF;
     
-    //printf("dp %d af %f\n", tempDP, tempAF);
-    if((tempDP >=20) && (tempADF >= 10) && (tempADR >= 10)) {
+    
+    if((totalBases >=20) && (tempADF >= 10) && (tempADR >= 10)) {
     if (tempAF >= 0.99) {
       candGT_arr[0] = j;
       candGT_arr[1] = j;
+      break;
       // if I find a homozygous site can skip additional searching
       // could put a goto if I wanted minor improvement
-    }  else if ((tempDP >= 500) && (tempAF >= 0.01)) {
+    }  else if ((totalBases >= 500) && (tempAF >= 0.01)) {
       // heteroplasmy call
       if (candGT_arr[0] == -1) {
 
         candGT_arr[0] = j;
-      } else if (candGT_arr[1] == -1) {
+      }
+      else if (candGT_arr[1] == -1) {
         candGT_arr[1] = j;
-      } else {
+      }
+      else {
+	break;
         //	  printf("site has more that 2 heteroplamies, and cannot display additional\n");
       }
     }
   }
   }
-  
-    
-
+  //printf("slot 1 %d slot 2 %d\n", candGT_arr[0], candGT_arr[1]);
     // verify that these values were changed, and if so update genotype
     if (candGT_arr[0] != -1){
-      gt_arr[sampleIndex * 2] = bcf_gt_unphased(candGT_arr[0]);
+      // doing order in reverse to prefer 0/1 opposed to 1/0.
+      gt_arr[sampleIndex * 2 + 1] = bcf_gt_unphased(candGT_arr[0]);
     }
-
+    else
+      {
+	gt_arr[sampleIndex * 2 + 1] = bcf_gt_unphased(0);
+      }
     if (candGT_arr[1] != -1){
-      gt_arr[sampleIndex * 2 + 1] = bcf_gt_unphased(candGT_arr[1]);
+      gt_arr[sampleIndex * 2] = bcf_gt_unphased(candGT_arr[1]);
     }
+    else
+      {
+	gt_arr[sampleIndex * 2] = bcf_gt_unphased(0);
+      }
+    
 
   
 
@@ -257,12 +277,12 @@ bcf1_t * process(bcf1_t * rec) {
     }
 
   // get dp (number of high quality bases)
-  int32_t * depthDP = 0;
-  int dpCount = 0;
-  if (bcf_get_format_int32(hdr, rec, "DP", & depthDP, & dpCount) < 0) {
-    printf("error with get format\n");
-    exit(1);
-  }
+  /* int32_t * depthDP = 0; */
+  /* int dpCount = 0; */
+  /* if (bcf_get_format_int32(hdr, rec, "DP", & depthDP, & dpCount) < 0) { */
+  /*   printf("error with get format\n"); */
+  /*   exit(1); */
+  /* } */
 
   // get genotypes
   int ngt, * gt_arr = NULL, ngt_arr = 0;
@@ -288,7 +308,7 @@ bcf1_t * process(bcf1_t * rec) {
   }
 
   //int32_t tempAD = 0;
-  int32_t tempDP = 0;
+  //int32_t tempDP = 0;
   for (int i = 0; i < nsamples; i++) {
     // check if the genotype is missing from low coverage sites and skip if soft
     // causes issue because AF ends up not being initialized. could possibly put this after the AF logic.
@@ -302,12 +322,11 @@ bcf1_t * process(bcf1_t * rec) {
     /*   0 */
     /* }; */
 
-    tempDP = depthDP[i];
+    //tempDP = depthDP[i];
 
     
     sample_param_t sampleParams = {
       .n_allele = n_allele,
-      .dp = tempDP,
       .gtArray = gt_arr,
       .adArray = adArray,
       .afArray = afArray,
