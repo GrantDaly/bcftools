@@ -16,7 +16,6 @@
 ##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths (high-quality bases)">
 ##FORMAT=<ID=ADF,Number=R,Type=Integer,Description="Allelic depths on the forward strand (high-quality bases)">
 ##FORMAT=<ID=ADR,Number=R,Type=Integer,Description="Allelic depths on the reverse strand (high-quality bases)">
-##FORMAT=<ID=AF,Number=R,Type=Float,Description="Allele Frequency">
 ##INFO=<ID=AD,Number=R,Type=Integer,Description="Total allelic depths (high-quality bases)">
 ##INFO=<ID=ADF,Number=R,Type=Integer,Description="Total allelic depths on the forward strand (high-quality bases)">
 ##INFO=<ID=ADR,Number=R,Type=Integer,Description="Total allelic depths on the reverse strand (high-quality bases)">
@@ -27,9 +26,12 @@
 ##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
 ##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
 ##INFO=<ID=MQ,Number=1,Type=Integer,Description="Average mapping quality">
+##FORMAT=<ID=AF,Number=R,Type=Float,Description="Allele Frequency">
 ##FORMAT=<ID=ART,Number=A,Type=Integer,Description="Artifact Score">
-##bcftools_pluginVersion=1.12-22-g7cd760b-dirty+htslib-1.12-25-g5b684ce
-##bcftools_pluginCommand=plugin heteroplasmy -o test/heteroplasmy.3.test.out.vcf test/heteroplasmy.3.test.vcf; Date=Thu Aug  5 12:42:22 2021
+##bcftools_pluginVersion=1.12-31-gdb4ab34-dirty+htslib-1.12-25-g5b684ce
+##bcftools_pluginCommand=plugin heteroplasmy -o test/heteroplasmy.3.test.out.vcf test/heteroplasmy.3.test.vcf; Date=Mon Aug 16 16:28:13 2021
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Sample_1	Sample_2	Sample_3	Sample_4
-chrM	1000	.	A	G	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	1/1:1000:0:0,500:0,500:0,1000:0,1:0	1/1:1000:0:0,500:0,500:0,1000:0,1:0	./.:1000:0:0,1000:0,0:0,1000:0,1:0	./.:1000:0:0,0:0,1000:0,1000:0,1:0
-chrM	1000	.	A	G	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	1/1:1000:0:0,500:0,500:0,1000:0,1:0	1/1:1000:0:0,500:0,500:0,1000:0,1:0	0/.:1000:0:450,100:450,0:900,100:0.9,0.1:100	0/.:1000:0:450,0:450,100:900,100:0.9,0.1:-100
+chrM	1000	.	T	G	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	1/1:1000:0:0,500:0,500:0,1000:0,1:0	1/1:1000:0:5,495:5,495:10,990:0.01,0.99:0	0/0:900:0:0,1000:0,0:0,1000:0,1:0	0/0:1000:0:0,0:0,1000:0,1000:0,1:0
+chrM	1000	.	T	G	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	1/1:1000:0:0,500:0,500:0,1000:0,1:0	1/1:1000:0:0,500:0,500:0,1000:0,1:0	0/0:1000:0:450,100:450,0:900,100:0.9,0.1:100	0/0:1000:0:450,0:450,100:900,100:0.9,0.1:-100
+chrM	1000	.	T	G	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	1/0:1000:0:50,500:50,500:100,900:0.1,0.9:0	1/0:1000:0:10,490:10,490:20,980:0.02,0.98:0	0/0:1000:0:450,100:450,0:900,100:0.9,0.1:100	0/0:1000:0:450,0:450,100:900,100:0.9,0.1:-100
+chrM	1000	.	T	G,C	24.0023	PASS	MQSB=5	GT:DP:SP:ADF:ADR:AD:AF:ART	2/1:1000:0:0,50,500:0,50,500:0,100,900:0,0.1,0.9:0,0	2/2:1000:0:0,50,500:0,50,500:5,5,990:0.005,0.005,0.99:0,0	1/0:1000:0:25,25,450:25,25,450:50,50,900:0.05,0.05,0.9:0,0	0/0:1000:0:450,0:450,100:900,100:0,0,0:-100,0

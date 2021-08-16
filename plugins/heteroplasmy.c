@@ -110,6 +110,7 @@ void processSample(sample_param_t params) {
   int tempAD = 0;
   int tempADF = 0;
   int tempADR = 0;
+  float tempAF = 0.0;
   
   float * afArray = params.afArray;
   int * adArray = params.adArray;
@@ -177,27 +178,37 @@ void processSample(sample_param_t params) {
   // normal vcf has 2 alleles so I'm using this. pretty good assumption because there are unlikely to be many tripplet heteroplasmies
   //int maxAlt = 2;
   //int numberAllelesAssigned = 0;
+
+  //calculate the allele frequencies. I am separating this because the variant calling logic has some breaks when a condition is met. This meant the AF calculation was sometimes scipped
   for (int j = 0; j < n_allele; j++) {
     tempAD = adArray[(sampleIndex * n_allele) + j];
     tempADF = adfArray[(sampleIndex * n_allele) + j];
     tempADR = adrArray[(sampleIndex * n_allele) + j];
 
     // calculate AF
-    float tempAF = 0.0;
+    
     if (totalBases > 0) {
 
-      tempAF = (float)((double) tempAD / (double) totalBases);
+      tempAF = (float) tempAD / (float) totalBases;
       //printf("allele depth %d total bases %d fraction %f\n",tempAD, totalBases, tempAF);
     } else {
       tempAF = 0;
     }
-
-    // determine if the allele is possibly an artifact
-
     afArray[(sampleIndex * n_allele) + j] = tempAF;
-    
-    
+
+  }
+
+
+  
+  for (int j = 0; j < n_allele; j++) {
+    tempAD = adArray[(sampleIndex * n_allele) + j];
+    tempADF = adfArray[(sampleIndex * n_allele) + j];
+    tempADR = adrArray[(sampleIndex * n_allele) + j];
+
     if((totalBases >=20) && (tempADF >= 10) && (tempADR >= 10)) {
+
+      // retreiving the AF for this allele from the array we previously filled
+    tempAF = afArray[(sampleIndex * n_allele) + j];
     if (tempAF >= 0.99) {
       candGT_arr[0] = j;
       candGT_arr[1] = j;
