@@ -107,16 +107,25 @@ void processSample(sample_param_t params) {
   const int n_allele = params.n_allele;
   //const int tempDP = params.dp;
 
-  int tempAD = 0;
-  int tempADF = 0;
-  int tempADR = 0;
-  float tempAF = 0.0;
   
   float * afArray = params.afArray;
   int * adArray = params.adArray;
   int * adfArray = params.adfArray;
   int * adrArray = params.adrArray;
 
+  // check if sample with missing values. Using first val of adArray
+  
+  if(adArray[0] == bcf_int32_missing) {
+    return;
+  }
+  else if(adArray[0] < 0) {
+    return;
+  }
+  int tempAD = 0;
+  int tempADF = 0;
+  int tempADR = 0;
+  float tempAF = 0.0;
+  
   int * artArray = params.artArray;
 
   int sampleIndex = params.sampleIndex;
@@ -133,7 +142,7 @@ void processSample(sample_param_t params) {
   int tempADRVar = 0;
   int numAltAlleles = n_allele - 1;
 
-  if(tempADRef >= 100){
+  if((tempADRef >= 100)){
       int minimumADStrand =  minimumInt(tempADFRef, tempADRRef);
       if(tempADRef != 0){
 	double refFrac = minimumADStrand / ((double) tempADRef);
@@ -310,12 +319,17 @@ bcf1_t * process(bcf1_t * rec) {
   printf("######## number of af %d or %d\n", afReturn, afCount);*/
   int numAF = n_allele * nsamples;
   float * afArray = malloc(numAF * sizeof(float));
+  for(int i = 0; i < numAF; i++){
+    //afArray[i] = bcf_float_missing;
+    bcf_float_set_missing(afArray[i]);
+  }
+
 
   // create and initialize the artifact array.
   int numART = (n_allele -1) * nsamples;
   int * artArray = malloc(numART * sizeof(int));
   for(int i = 0; i < numART; i++){
-    artArray[i] = 0;
+    artArray[i] = bcf_int32_missing;
   }
 
   //int32_t tempAD = 0;
