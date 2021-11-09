@@ -112,25 +112,42 @@ void processSample(sample_param_t params) {
   int * adArray = params.adArray;
   int * adfArray = params.adfArray;
   int * adrArray = params.adrArray;
+  // going to try to initialize any missing values to 0.
+  // I'm doing this 
+       /*for(int i = 0; i < n_allele; i++){
+    if(afArray[i] == bcf_float_missing) {
+      afArray[i] = 0.0;
+    }
+    if(adArray[i] == bcf_int32_missing){
+      adArray[i] = 0;
+    }
+    if(adfArray[i] == bcf_int32_missing){
+      adfArray[i] = 0;
+    }
+    if(adrArray[i] == bcf_int32_missing){
+      adrArray[i] = 0;
+    }
+    }*/
+
+   int * artArray = params.artArray;
+
+  int sampleIndex = params.sampleIndex;
+
+  int * gt_arr = params.gtArray;
 
   // check if sample with missing values. Using first val of adArray
-  
-  if(adArray[0] == bcf_int32_missing) {
+  // 
+  if(adArray[(sampleIndex * n_allele)] == bcf_int32_missing) {
     return;
   }
-  else if(adArray[0] < 0) {
+  /*else if(adArray[0] < 0) {
     return;
-  }
+    }*/
   int tempAD = 0;
   int tempADF = 0;
   int tempADR = 0;
   float tempAF = 0.0;
   
-  int * artArray = params.artArray;
-
-  int sampleIndex = params.sampleIndex;
-
-  int * gt_arr = params.gtArray;
 
 
 
@@ -180,7 +197,9 @@ void processSample(sample_param_t params) {
 
   int totalBases = 0;
   for (int j = 0; j < n_allele; j++) {
-    totalBases += adArray[(sampleIndex * n_allele) + j];
+    int tempADVal = adArray[(sampleIndex * n_allele) + j];
+    if(tempADVal != bcf_int32_missing)
+    totalBases += tempADVal;
   }
   // call variants on all alleles
 
@@ -196,7 +215,7 @@ void processSample(sample_param_t params) {
 
     // calculate AF
     
-    if (totalBases > 0) {
+    if ((tempAD != bcf_int32_missing) && (totalBases > 0)) {
 
       tempAF = (float) tempAD / (float) totalBases;
       //printf("allele depth %d total bases %d fraction %f\n",tempAD, totalBases, tempAF);
